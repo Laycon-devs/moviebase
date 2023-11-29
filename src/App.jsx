@@ -1,40 +1,47 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { useEffect, useState } from "react";
+import SearchIcon from "./search.svg";
+import MovieCard from "./MovieCard";
 
 function App() {
-  const [countIncre, setCountIncre] = useState(0);
-  const [countDecre, setCountDecre] = useState(0);
-
-  const handleCountIncrement = () => {
-    setCountIncre((prevCount) => (countIncre, prevCount + 1));
+  const API_KEY = "7d81660f";
+  const API_URL = "http://www.omdbapi.com/?i=tt3896198&apikey=";
+  const [movies, setMovies] = useState([]);
+  const [search, setSearch] = useState("");
+  const fetchMovies = async (title) => {
+    const response = await fetch(`${API_URL}${API_KEY}&s=${title}`);
+    const data = await response.json();
+    setMovies(data.Search);
+    console.log(data.Search);
   };
-  const handleCountDecrement = () => {
-    setCountDecre((prevCount) => (countDecre, prevCount - 1));
-  };
-
+  // };
+  useEffect(() => {
+    fetchMovies();
+  }, []);
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <h1>MovieBase</h1>
+
+      <div className="search">
+        <input
+        value={search}
+          type="text"
+          placeholder="search for movies"
+          onChange={(e) => {setSearch(e.target.value)}}
+        />
+        <img src={SearchIcon} alt="search" onClick={() => {fetchMovies(search)}} />
       </div>
-      <h1>Hycon Vite + React Revamp</h1>
-      <div className="card">
-        <button onClick={handleCountIncrement} style={{ marginRight: "2rem" }}>
-          count is {countIncre}
-        </button>
-        <button onClick={handleCountDecrement}>count is {countDecre}</button>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      {movies?.length > 0 ? (
+        <div className="container">
+          {movies.map((movie, index) => (
+            <MovieCard key={index} movie={movie} />
+          ))}
+        </div>
+      ) : (
+        <div className="">
+          <h2>No movies found</h2>
+        </div>
+      )}
+    </div>
   );
 }
 
