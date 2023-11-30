@@ -1,39 +1,45 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
+import { useEffect } from "react";
+import Moviecard from "./Moviecard";
 
 function App() {
-  const [countIncre, setCountIncre] = useState(0);
-  const [countDecre, setCountDecre] = useState(0);
+  const API_KEY = "7d81660f";
+  const API_URL = "http://www.omdbapi.com/?i=tt3896198&apikey=";
 
-  const handleCountIncrement = () => {
-    setCountIncre((prevCount) => (countIncre, prevCount + 1));
-  };
-  const handleCountDecrement = () => {
-    setCountDecre((prevCount) => (countDecre, prevCount - 1));
-  };
+  const [movies, setMovies] = useState([]);
+  const [searchMovies, setSearchMovies] = useState("");
 
+  const fetchMovie = async (movieTitle) => {
+    const response = await fetch(`${API_URL}${API_KEY}&s=${movieTitle}`);
+    const data = await response.json();
+    setMovies(data.Search);
+    // console.log(movieTitle, data.Search);
+  };
+  useEffect(() => {
+    fetchMovie();
+  }, []);
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="app">
+        <h1>Movie Base</h1>
+        <div className="search">
+          <input
+            value={searchMovies}
+            onChange={(e) => {
+              setSearchMovies(e.target.value);
+            }}
+            type="text"
+            placeholder="search movie"
+          />
+          <button onClick={() => fetchMovie(searchMovies)}>Search</button>
+        </div>
+        {
+          movies?.length > 0 ? (<div className="container">
+          {movies.map((movie, index) => (<Moviecard key={index} movie={movie} />))}
+          </div>) : ( <div className="">No Movie Found</div> )
+        }
       </div>
-      <h1>Hycon Vite + React Revamp</h1>
-      <div className="card">
-        <button onClick={handleCountIncrement} style={{ marginRight: "2rem" }}>
-          count is {countIncre}
-        </button>
-        <button onClick={handleCountDecrement}>count is {countDecre}</button>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   );
 }
